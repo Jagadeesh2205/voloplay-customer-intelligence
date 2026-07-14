@@ -75,44 +75,56 @@ Be specific, data-driven, and actionable. Reference actual data points from the 
 
 async function generateAIAnalysis(customer, apiKey) {
   const prompt = buildPrompt(customer);
+  const models = ["gemini-2.0-flash", "gemini-1.5-flash"];
+  let lastError = null;
 
-  const response = await fetch(`${GEMINI_API_BASE}?key=${apiKey}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: {
-        temperature: 0.3,
-        topK: 40,
-        topP: 0.95,
-        maxOutputTokens: 1500
+  for (const model of models) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.3,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 1500
+          }
+        })
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error?.message || `API error ${response.status} with ${model}`);
       }
-    })
-  });
 
-  if (!response.ok) {
-    const err = await response.json();
-    throw new Error(err.error?.message || `API error ${response.status}`);
-  }
+      const data = await response.json();
+      const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-  const data = await response.json();
-  const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+      // Extract JSON from the response (handle markdown code blocks)
+      const jsonMatch = rawText.match(/```(?:json)?\s*([\s\S]*?)```/) || [null, rawText];
+      const jsonStr = jsonMatch[1].trim();
 
-  // Extract JSON from the response (handle markdown code blocks)
-  const jsonMatch = rawText.match(/```(?:json)?\s*([\s\S]*?)```/) || [null, rawText];
-  const jsonStr = jsonMatch[1].trim();
-
-  try {
-    return JSON.parse(jsonStr);
-  } catch (e) {
-    // Fallback: try parsing the raw text
-    const start = rawText.indexOf('{');
-    const end = rawText.lastIndexOf('}') + 1;
-    if (start !== -1 && end > start) {
-      return JSON.parse(rawText.slice(start, end));
+      try {
+        return JSON.parse(jsonStr);
+      } catch (e) {
+        // Fallback: try parsing the raw text
+        const start = rawText.indexOf('{');
+        const end = rawText.lastIndexOf('}') + 1;
+        if (start !== -1 && end > start) {
+          return JSON.parse(rawText.slice(start, end));
+        }
+        throw new Error("Failed to parse AI response as JSON");
+      }
+    } catch (err) {
+      console.warn(`Failed with model ${model}:`, err.message);
+      lastError = err;
     }
-    throw new Error("Failed to parse AI response as JSON");
   }
+
+  throw lastError || new Error("Failed to generate AI analysis across all models");
 }
 
 function getSeverityColor(severity) {
