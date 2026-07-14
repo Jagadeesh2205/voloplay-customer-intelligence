@@ -71,6 +71,8 @@ Based on the above multi-source data, provide a structured analysis in the follo
 }
 
 Be specific, data-driven, and actionable. Reference actual data points from the analysis. Provide 2-4 risk signals, 2-3 opportunities, and 3-4 next best actions ranked by priority.`;
+}
+
 async function generateAIAnalysis(customer, apiKey) {
   const prompt = buildPrompt(customer);
   const models = [
