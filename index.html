@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CustomerIQ — Unified Customer Intelligence Platform</title>
+  <meta name="description" content="CustomerIQ consolidates CRM, support tickets, email, Slack, and product usage data into a single AI-powered customer view with risk signals and next best actions.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="styles/main.css">
+  <style>
+    /* ── Landing Page Specific ── */
+    .hero {
+      padding: 80px 0 60px;
+      text-align: center;
+      position: relative;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 100px;
+      background: rgba(59,130,246,0.1);
+      border: 1px solid rgba(59,130,246,0.2);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--blue);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .hero-title {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #F1F5F9 0%, #94A3B8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-title span {
+      background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-subtitle {
+      font-size: 18px;
+      color: var(--text-secondary);
+      max-width: 580px;
+      margin: 0 auto 36px;
+      line-height: 1.7;
+    }
+
+    .sources-pill-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+    .source-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      backdrop-filter: blur(12px);
+      transition: var(--transition);
+    }
+    .source-pill:hover { border-color: var(--border-bright); color: var(--text-primary); }
+    .source-pill-icon { font-size: 16px; }
+
+    .api-key-section {
+      max-width: 520px;
+      margin: 0 auto 48px;
+      padding: 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(20px);
+      text-align: left;
+    }
+    .api-key-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .api-key-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .api-key-input-row {
+      display: flex;
+      gap: 8px;
+    }
+    .api-key-field {
+      flex: 1;
+      padding: 10px 14px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+      transition: var(--transition);
+    }
+    .api-key-field:focus {
+      border-color: rgba(59,130,246,0.5);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    }
+    .api-key-field::placeholder { color: var(--text-muted); }
+
+    .search-section {
+      max-width: 560px;
+      margin: 0 auto 40px;
+      position: relative;
+    }
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      pointer-events: none;
+    }
+    .search-input-field {
+      width: 100%;
+      padding: 14px 16px 14px 48px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-primary);
+      font-size: 15px;
+      outline: none;
+      transition: var(--transition);
+      backdrop-filter: blur(20px);
+    }
+    .search-input-field:focus {
+      border-color: rgba(59,130,246,0.4);
+      box-shadow: 0 0 0 4px rgba(59,130,246,0.08);
+      background: rgba(255,255,255,0.06);
+    }
+    .search-input-field::placeholder { color: var(--text-muted); }
+
+    .accounts-section { padding-bottom: 80px; }
+    .accounts-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .accounts-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .accounts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 18px;
+    }
+    .account-card {
+      cursor: pointer;
+      transition: var(--transition-slow);
+      position: relative;
+      overflow: hidden;
+    }
+    .account-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(59,130,246,0.04) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    .account-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(59,130,246,0.25);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(59,130,246,0.1);
+    }
+    .account-card:hover::before { opacity: 1; }
+
+    .stats-row {
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      margin-bottom: 60px;
+      flex-wrap: wrap;
+    }
+    .stat-box { text-align: center; }
+    .stat-num {
+      font-size: 32px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-desc { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 0;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-mesh"></div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <div class="nav-logo">
+        <div class="nav-logo-icon">🧠</div>
+        <div class="nav-logo-text">Customer<span>IQ</span></div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="badge badge-blue hide-mobile">AI-Powered</span>
+        <span class="badge badge-emerald hide-mobile">5 Data Sources</span>
+        <span style="font-size:12px;color:var(--text-muted);">Built for Voloplay</span>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-eyebrow">
+          <span>🧠</span> AI Customer Intelligence Platform
+        </div>
+        <h1 class="hero-title">
+          One View.<br><span>Every Signal.</span>
+        </h1>
+        <p class="hero-subtitle">
+          CustomerIQ consolidates data from your CRM, support desk, email, Slack, and product analytics into a unified 360° account view — with AI-powered insights and next best actions.
+        </p>
+
+        <div class="sources-pill-row">
+          <div class="source-pill"><span class="source-pill-icon">🏢</span>Zoho CRM</div>
+          <div class="source-pill"><span class="source-pill-icon">🎫</span>Zendesk</div>
+          <div class="source-pill"><span class="source-pill-icon">✉️</span>Email</div>
+          <div class="source-pill"><span class="source-pill-icon">💬</span>Slack</div>
+          <div class="source-pill"><span class="source-pill-icon">📊</span>Product Analytics</div>
+          <div class="source-pill" style="border-color:rgba(99,102,241,0.3);color:var(--purple);"><span class="source-pill-icon">🤖</span>Gemini AI</div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row">
+          <div class="stat-box">
+            <div class="stat-num">6</div>
+            <div class="stat-desc">Customer Accounts</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num">5</div>
+            <div class="stat-desc">Data Sources</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num">360°</div>
+            <div class="stat-desc">Customer View</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num">AI</div>
+            <div class="stat-desc">Powered Insights</div>
+          </div>
+        </div>
+
+        <!-- API Key Input -->
+        <div class="api-key-section">
+          <div class="api-key-title">
+            <span>🔑</span> Gemini API Key <span class="badge badge-purple">Optional</span>
+          </div>
+          <p class="api-key-desc">
+            Enter your Gemini API key to unlock AI-powered summaries, risk analysis, and next best action recommendations. 
+            Get a free key at <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--blue);">aistudio.google.com</a>.
+          </p>
+          <div class="api-key-input-row">
+            <input
+              type="password"
+              id="landing-api-key"
+              class="api-key-field"
+              placeholder="AIza..."
+              autocomplete="off"
+            >
+            <button class="btn btn-primary btn-sm" onclick="document.getElementById('landing-api-key').type === 'password' ? (document.getElementById('landing-api-key').type='text') : (document.getElementById('landing-api-key').type='password')">
+              👁
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Accounts Section -->
+    <section class="accounts-section">
+      <div class="container">
+        <!-- Search -->
+        <div class="search-section">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            id="search-input"
+            class="search-input-field"
+            placeholder="Search accounts by name, industry, plan, or tag…"
+            autocomplete="off"
+          >
+        </div>
+
+        <div class="accounts-header">
+          <div class="accounts-title">All Accounts</div>
+          <span class="badge badge-gray">${6} accounts</span>
+        </div>
+
+        <div class="accounts-grid" id="accounts-grid">
+          <!-- Rendered by app.js -->
+          <div style="grid-column:1/-1;text-align:center;padding:60px 0;">
+            <div class="spinner" style="margin:0 auto 12px;width:32px;height:32px;"></div>
+            <div style="color:var(--text-muted);">Loading accounts…</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div style="margin-bottom:8px;">
+        Built with <span style="color:var(--rose);">♥</span> for the Voloplay AI Tool-Building Challenge
+      </div>
+      <div>CustomerIQ · Unified Customer Intelligence · Powered by Google Gemini API</div>
+    </div>
+  </footer>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="scripts/data.js"></script>
+  <script src="scripts/ai.js"></script>
+  <script src="scripts/app.js"></script>
+</body>
+</html>

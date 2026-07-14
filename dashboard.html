@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CustomerIQ — Account 360° View</title>
+  <meta name="description" content="Unified 360° customer intelligence dashboard with AI-powered insights, risk signals, and next best action recommendations.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/dashboard.css">
+
+  <style>
+    /* ── Dashboard page overrides ── */
+    .page-wrap {
+      padding: 0 24px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 0 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .breadcrumb-link { cursor: pointer; transition: color 0.2s; }
+    .breadcrumb-link:hover { color: var(--text-primary); }
+    .breadcrumb-sep { font-size: 10px; }
+    .breadcrumb-current { color: var(--text-secondary); }
+
+    /* ── Sources grid: on large screens go 2×3, usage spans 2 ── */
+    @media (min-width: 900px) {
+      .sources-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .sources-grid .source-card:last-child {
+        grid-column: 1 / -1;
+      }
+    }
+    @media (min-width: 1200px) {
+      .sources-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .sources-grid .source-card:last-child {
+        grid-column: 3 / 4;
+      }
+    }
+
+    /* ── Sources usage card always full width under certain breakpoint ── */
+    @media (max-width: 899px) {
+      .sources-grid .source-card:last-child {
+        grid-column: 1 / -1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-mesh"></div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo" style="text-decoration:none;">
+        <div class="nav-logo-icon">🧠</div>
+        <div class="nav-logo-text">Customer<span>IQ</span></div>
+      </a>
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="btn btn-ghost btn-sm hide-mobile">← All Accounts</a>
+        <span class="badge badge-purple" id="nav-company-badge">Loading…</span>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-wrap">
+      <!-- Breadcrumb -->
+      <div class="breadcrumb">
+        <span class="breadcrumb-link" onclick="window.location.href='index.html'">Home</span>
+        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-link" onclick="window.location.href='index.html'">Accounts</span>
+        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-current" id="breadcrumb-name">Loading…</span>
+      </div>
+
+      <!-- Account Header -->
+      <div id="account-header">
+        <!-- Rendered by dashboard.js -->
+        <div class="card" style="padding:40px;text-align:center;margin-bottom:24px;">
+          <div class="spinner" style="margin:0 auto 12px;width:36px;height:36px;"></div>
+          <div style="color:var(--text-muted);">Loading account data…</div>
+        </div>
+      </div>
+
+      <!-- Main Dashboard Layout -->
+      <div class="dashboard-layout">
+        <!-- Left Column -->
+        <div>
+          <!-- Source Cards -->
+          <div class="section-header" style="margin-bottom:16px;">
+            <div class="section-title">📡 Data Sources</div>
+            <span class="badge badge-blue">5 Sources Active</span>
+          </div>
+          <div class="sources-grid" id="source-cards">
+            <!-- Rendered by dashboard.js -->
+            <div style="grid-column:1/-1;text-align:center;padding:40px 0;color:var(--text-muted);">
+              <div class="spinner" style="margin:0 auto;"></div>
+            </div>
+          </div>
+
+          <!-- Activity Timeline -->
+          <div id="activity-timeline" style="margin-top:0;">
+            <!-- Rendered by dashboard.js -->
+          </div>
+
+          <!-- Two-column grid: contacts + usage detail -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
+            <div id="contacts-card"></div>
+            <div id="usage-detail"></div>
+          </div>
+
+          <!-- Email Threads Section -->
+          <div id="email-threads-section" style="margin-top:16px;"></div>
+        </div>
+
+        <!-- Right Column: AI Sidebar -->
+        <div class="ai-sidebar">
+          <div class="ai-panel">
+            <div class="ai-panel-header">
+              <div class="ai-icon-wrap">🤖</div>
+              <div>
+                <div class="ai-title">AI Intelligence</div>
+                <div class="ai-subtitle">Powered by Gemini</div>
+              </div>
+            </div>
+
+            <!-- API Key Input -->
+            <div class="ai-key-input-wrap">
+              <div class="ai-key-input-label">
+                🔑 Gemini API Key
+                <a href="https://aistudio.google.com/app/apikey" target="_blank"
+                   style="color:var(--blue);font-size:11px;margin-left:4px;">Get free key →</a>
+              </div>
+              <input
+                type="password"
+                id="ai-key-input"
+                class="ai-key-input"
+                placeholder="AIza..."
+                autocomplete="off"
+              >
+            </div>
+
+            <!-- Generate Button -->
+            <button id="ai-generate-btn" class="ai-generate-btn" onclick="triggerAIAnalysis()">
+              ✨ Generate AI Analysis
+            </button>
+
+            <!-- What's included info -->
+            <div style="margin-top:14px;padding:12px;background:rgba(0,0,0,0.2);border-radius:8px;font-size:12px;color:var(--text-muted);line-height:1.6;">
+              AI analysis includes:<br>
+              📋 Executive summary · ⚠️ Risk signals<br>
+              🚀 Opportunities · ✅ Next best actions
+            </div>
+
+            <!-- AI Results Panel -->
+            <div id="ai-results">
+              <!-- Rendered by dashboard.js -->
+            </div>
+          </div>
+
+          <!-- Quick Stats Card -->
+          <div class="card" style="padding:20px;margin-top:16px;" id="quick-stats-card">
+            <div class="section-title" style="margin-bottom:14px;">⚡ Quick Stats</div>
+            <div id="quick-stats-content">
+              <!-- Populated after init -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="scripts/data.js"></script>
+  <script src="scripts/ai.js"></script>
+  <script src="scripts/dashboard.js"></script>
+
+  <script>
+    // Additional init: set nav badge and breadcrumb, render quick stats
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        if (!currentCustomer) return;
+        const c = currentCustomer;
+        document.getElementById('nav-company-badge').textContent = c.company;
+        document.getElementById('breadcrumb-name').textContent = c.company;
+        document.title = `${c.company} — CustomerIQ`;
+
+        // Quick Stats
+        const days = daysUntil(c.crm.renewalDate);
+        const renewalColor = days < 30 ? 'var(--rose)' : days < 90 ? 'var(--amber)' : 'var(--emerald)';
+        document.getElementById('quick-stats-content').innerHTML = `
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;justify-content:space-between;font-size:13px;">
+              <span style="color:var(--text-muted);">ARR</span>
+              <span style="font-weight:600;">${formatCurrency(c.crm.arr)}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;">
+              <span style="color:var(--text-muted);">Plan</span>
+              <span style="font-weight:600;">${c.crm.plan}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;">
+              <span style="color:var(--text-muted);">Renewal</span>
+              <span style="font-weight:600;color:${renewalColor};">${days}d away</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;">
+              <span style="color:var(--text-muted);">DAU/MAU</span>
+              <span style="font-weight:600;">${Math.round(c.usage.dauMauRatio*100)}%</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;">
+              <span style="color:var(--text-muted);">Adoption</span>
+              <span style="font-weight:600;">${Math.round(c.usage.adoptionRate*100)}%</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;">
+              <span style="color:var(--text-muted);">Plan util.</span>
+              <span style="font-weight:600;">${Math.round(c.usage.planUtilization*100)}%</span>
+            </div>
+            <hr class="divider">
+            <div style="display:flex;justify-content:space-between;font-size:13px;">
+              <span style="color:var(--text-muted);">Open tickets</span>
+              <span style="font-weight:600;color:${c.support.openTickets>2?'var(--rose)':'var(--text-primary)'};">${c.support.openTickets}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;">
+              <span style="color:var(--text-muted);">Escalations</span>
+              <span style="font-weight:600;color:${c.support.escalations>0?'var(--rose)':'var(--emerald)'};">${c.support.escalations}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;">
+              <span style="color:var(--text-muted);">NPS Score</span>
+              <span style="font-weight:600;color:${c.crm.npsScore>=8?'var(--emerald)':c.crm.npsScore>=6?'var(--amber)':'var(--rose)'};">${c.crm.npsScore}/10</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;">
+              <span style="color:var(--text-muted);">Login trend</span>
+              <span style="font-weight:600;text-transform:capitalize;">${c.usage.loginTrend}</span>
+            </div>
+          </div>`;
+
+        // Email threads detail section
+        document.getElementById('email-threads-section').innerHTML = `
+          <div class="card" style="padding:20px;">
+            <div class="section-header" style="margin-bottom:14px;">
+              <div class="section-title">✉️ Recent Email Threads</div>
+              <span class="badge ${c.emails.sentiment.includes('positive') ? 'badge-emerald' : c.emails.sentiment.includes('negative') ? 'badge-rose' : 'badge-amber'}">
+                ${getSentimentIcon(c.emails.sentiment)} ${c.emails.sentiment}
+              </span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              ${c.emails.threads.map(e => `
+                <div style="padding:12px 14px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                    <span style="font-size:12px;font-weight:600;color:var(--text-secondary);">${e.from}</span>
+                    <span style="font-size:11px;color:var(--text-muted);">${formatDate(e.date)}</span>
+                    <span class="badge ${e.sentiment === 'positive' ? 'badge-emerald' : e.sentiment === 'negative' ? 'badge-rose' : 'badge-gray'}" style="margin-left:auto;">
+                      ${e.sentiment}
+                    </span>
+                  </div>
+                  <div style="font-size:13px;font-weight:500;margin-bottom:4px;">${e.subject}</div>
+                  <div style="font-size:12px;color:var(--text-muted);line-height:1.5;font-style:italic;">"${e.snippet}"</div>
+                </div>`).join('')}
+            </div>
+          </div>`;
+
+      }, 200);
+    });
+  </script>
+</body>
+</html>
