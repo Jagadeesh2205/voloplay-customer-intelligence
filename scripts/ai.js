@@ -71,16 +71,18 @@ Based on the above multi-source data, provide a structured analysis in the follo
 }
 
 Be specific, data-driven, and actionable. Reference actual data points from the analysis. Provide 2-4 risk signals, 2-3 opportunities, and 3-4 next best actions ranked by priority.`;
-}
-
 async function generateAIAnalysis(customer, apiKey) {
   const prompt = buildPrompt(customer);
-  const models = ["gemini-2.0-flash", "gemini-1.5-flash"];
+  const models = [
+    { name: "gemini-2.0-flash", version: "v1beta" },
+    { name: "gemini-1.5-flash", version: "v1" },
+    { name: "gemini-1.5-flash", version: "v1beta" }
+  ];
   let lastError = null;
 
   for (const model of models) {
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const url = `https://generativelanguage.googleapis.com/${model.version}/models/${model.name}:generateContent?key=${apiKey}`;
       const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -97,7 +99,7 @@ async function generateAIAnalysis(customer, apiKey) {
 
       if (!response.ok) {
         const err = await response.json();
-        throw new Error(err.error?.message || `API error ${response.status} with ${model}`);
+        throw new Error(err.error?.message || `API error ${response.status} with ${model.name} (${model.version})`);
       }
 
       const data = await response.json();
@@ -119,7 +121,7 @@ async function generateAIAnalysis(customer, apiKey) {
         throw new Error("Failed to parse AI response as JSON");
       }
     } catch (err) {
-      console.warn(`Failed with model ${model}:`, err.message);
+      console.warn(`Failed with model ${model.name} (${model.version}):`, err.message);
       lastError = err;
     }
   }
